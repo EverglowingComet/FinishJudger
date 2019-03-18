@@ -7,14 +7,21 @@
 //
 
 import UIKit
+import MobileCoreServices
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UINavigationControllerDelegate {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+    @IBOutlet weak var timerLayout: UIView!
+    @IBOutlet weak var timeLabel: UILabel!
+    @IBOutlet weak var resetButton: UIButton!
+    @IBOutlet weak var startButton: UIButton!
+    
+    
+    @IBOutlet weak var recordButton: UIButton!
+    
+    
+    @IBAction func triggerTimer(_ sender: UIButton) {
+        
     }
-
-
 }
 

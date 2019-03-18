@@ -14,6 +14,7 @@
 		C002AEF2223F367E0038C3C9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C002AEF0223F367E0038C3C9 /* LaunchScreen.storyboard */; };
 		C002AEFD223F367E0038C3C9 /* FinishJudgerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C002AEFC223F367E0038C3C9 /* FinishJudgerTests.swift */; };
 		C002AF08223F367E0038C3C9 /* FinishJudgerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C002AF07223F367E0038C3C9 /* FinishJudgerUITests.swift */; };
+		C06D9EFC223FE8D300BF6EAE /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06D9EFB223FE8D300BF6EAE /* CameraView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,7 @@
 		C002AF03223F367E0038C3C9 /* FinishJudgerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinishJudgerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C002AF07223F367E0038C3C9 /* FinishJudgerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishJudgerUITests.swift; sourceTree = "<group>"; };
 		C002AF09223F367E0038C3C9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C06D9EFB223FE8D300BF6EAE /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +99,7 @@
 		C002AEE6223F367C0038C3C9 /* FinishJudger */ = {
 			isa = PBXGroup;
 			children = (
+				C06D9EFE223FE90200BF6EAE /* Camera */,
 				C002AEE7223F367C0038C3C9 /* AppDelegate.swift */,
 				C002AEE9223F367C0038C3C9 /* ViewController.swift */,
 				C002AEEB223F367C0038C3C9 /* Main.storyboard */,
@@ -123,6 +126,14 @@
 				C002AF09223F367E0038C3C9 /* Info.plist */,
 			);
 			path = FinishJudgerUITests;
+			sourceTree = "<group>";
+		};
+		C06D9EFE223FE90200BF6EAE /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				C06D9EFB223FE8D300BF6EAE /* CameraView.swift */,
+			);
+			path = Camera;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -256,6 +267,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C06D9EFC223FE8D300BF6EAE /* CameraView.swift in Sources */,
 				C002AEEA223F367C0038C3C9 /* ViewController.swift in Sources */,
 				C002AEE8223F367C0038C3C9 /* AppDelegate.swift in Sources */,
 			);
