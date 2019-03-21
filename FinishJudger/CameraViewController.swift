@@ -8,6 +8,7 @@
 
 import UIKit
 import MobileCoreServices
+import SCRecorder
 
 class CameraViewController: UIViewController, UINavigationControllerDelegate {
 
@@ -16,8 +17,11 @@ class CameraViewController: UIViewController, UINavigationControllerDelegate {
     @IBOutlet weak var resetButton: UIButton!
     @IBOutlet weak var startButton: UIButton!
     
-    
+    // Record Variables
     @IBOutlet weak var recordButton: UIButton!
+    @IBOutlet var cameraView: UIView!
+    let cameraViewModel = CameraViewModel.sharedModel()
+    
     
     // Status Variables
     var gameTimerRunning = false
@@ -42,6 +46,12 @@ class CameraViewController: UIViewController, UINavigationControllerDelegate {
         
         recordButton.layer.cornerRadius = recordButton.bounds.width / 2
         resetButton.layer.masksToBounds = true
+        
+        cameraViewModel?.delegate = self
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        cameraViewModel?.initRecorder(with: cameraView)
     }
     
     // Timer functions
@@ -58,7 +68,7 @@ class CameraViewController: UIViewController, UINavigationControllerDelegate {
         } else {
             resetButton.isEnabled = true
             resetButton.alpha = 1
-                        
+            
             startButton.setTitle("START", for: .normal)
         }
     }
@@ -105,7 +115,27 @@ class CameraViewController: UIViewController, UINavigationControllerDelegate {
     }
     
     @IBAction func recordVideo(_ sender: UIButton) {
-        
+        cameraViewModel?.shotRecording()
     }
 }
+let red = UIColor(displayP3Red: 1.0, green: 0, blue: 0, alpha: 1.0)
+let white = UIColor(displayP3Red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
 
+extension CameraViewController : CameraViewModelDelegate {
+    
+    func isStartedRecording(isRecording: Bool) {
+        if isRecording {
+            recordButton.setTitle("STOP", for: .normal)
+            recordButton.backgroundColor = white
+            recordButton.setTitleColor(red, for: .normal)
+        } else {
+            recordButton.setTitle("START", for: .normal)
+            recordButton.backgroundColor = red
+            recordButton.setTitleColor(white, for: .normal)
+        }
+    }
+    
+    func finishedRecord() {
+        performSegue(withIdentifier: "SavingMatchVideo", sender: nil)
+    }
+}
