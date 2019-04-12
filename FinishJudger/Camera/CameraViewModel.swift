@@ -8,16 +8,18 @@
 
 import UIKit
 import SCRecorder
+import Photos
 
 
 var sharedCameraViewModel: CameraViewModel?
 
-let maxDuration = 5
+let maxDuration = 1000
 
 
 protocol CameraViewModelDelegate: AnyObject {
-    func isStartedRecording(isRecording: Bool)
-    func finishedRecord()
+    func recordStatusToggled(isRecording: Bool)
+    func recordFailed(error: String)
+    func recordFinished(file_path: String)
 }
 
 
@@ -27,6 +29,7 @@ class CameraViewModel: NSObject
     
     var recorder = SCRecorder()
     weak var delegate: CameraViewModelDelegate?
+    var file_path : String? = nil
     
     // MARK: static method
     
@@ -57,38 +60,22 @@ class CameraViewModel: NSObject
         recorder.stopRunning()
     }
     
-    func shotRecording() {
+    func toggleRecording() {
         if recorder.isRecording {
             recorder.pause {[weak self] in
-                self?.finishedRecording()
+                self?.pauseCompleted()
             }
-            
-            delegate?.isStartedRecording(isRecording: false)
+            recorder.stopRunning()
             
         } else {
             recorder.record()
             
-            delegate?.isStartedRecording(isRecording: true)
+            delegate?.recordStatusToggled(isRecording: true)
         }
     }
     
-    /*
-     func startRecording() {
-     recorder.record()
-     }
-     
-     func stopRecording() {
-     if recorder.isRecording {
-     recorder.pause {[weak self] in
-     self?.finishedRecording()
-     }
-     } else {
-     finishedRecording()
-     }
-     }*/
-    
-    func finishedRecording() {
-        self.delegate?.finishedRecord()
+    func pauseCompleted() {
+        delegate?.recordStatusToggled(isRecording: false)
     }
     
     // MARK: private method
@@ -119,6 +106,15 @@ class CameraViewModel: NSObject
         
         recorder.startRunning()
     }
+    
+    func reinitRecorder() {
+        recorder.stopRunning()
+        
+        recorder.session = SCRecordSession()
+        recorder.session?.fileType = AVFileType.mov.rawValue
+        
+        recorder.startRunning()
+    }
 }
 
 
@@ -128,15 +124,74 @@ extension CameraViewModel: SCRecorderDelegate
 {
     func recorder(_ recorder: SCRecorder, didComplete session: SCRecordSession) {
         NSLog("recorder didComlete")
-        finishedRecording()
+        session.mergeSegments(usingPreset: AVAssetExportPresetHighestQuality) { (url, error) in
+            if (error == nil) {
+                if url != nil && self.file_path != nil {
+                    try? FileManager.default.copyItem(at: url!, to: URL(fileURLWithPath: self.file_path!))
+                    if FileManager.default.fileExists(atPath: self.file_path!) {
+                        PHPhotoLibrary.requestAuthorization { (status) in
+                            if status == PHAuthorizationStatus.authorized {
+                                PHPhotoLibrary.shared().performChanges({
+                                    PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: URL(fileURLWithPath: self.file_path!))
+                                }) { completed, error in
+                                    if completed {
+                                        self.delegate?.recordFinished(file_path: self.file_path!)
+                                    } else {
+                                        self.delegate?.recordFailed(error: "File url is invalid")
+                                    }
+                                }
+                            } else {
+                                self.delegate?.recordFailed(error: "Photo library permission denied")
+                            }
+                        }
+                    } else {
+                        self.delegate?.recordFailed(error: "Temp file copy failed")
+                    }
+                } else {
+                    self.delegate?.recordFailed(error: "Invalid temp url or file url")
+                }
+            } else {
+                print(error as Any)
+                self.delegate?.recordFailed(error: "Merge Session failed")
+            }
+        }
     }
     
     func recorder(_ recorder: SCRecorder, didComplete segment: SCRecordSessionSegment?, in session: SCRecordSession, error: Error?) {
         NSLog("recorder didComlete with segment")
-        finishedRecording()
+        session.mergeSegments(usingPreset: AVAssetExportPresetHighestQuality) { (url, error) in
+            if (error == nil) {
+                if url != nil && self.file_path != nil {
+                    try? FileManager.default.copyItem(at: url!, to: URL(fileURLWithPath: self.file_path!))
+                    if FileManager.default.fileExists(atPath: self.file_path!) {
+                        PHPhotoLibrary.requestAuthorization { (status) in
+                            if status == PHAuthorizationStatus.authorized {
+                                PHPhotoLibrary.shared().performChanges({
+                                    PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: URL(fileURLWithPath: self.file_path!))
+                                }) { completed, error in
+                                    if completed {
+                                        self.delegate?.recordFinished(file_path: self.file_path!)
+                                    } else {
+                                        self.delegate?.recordFailed(error: "File url is invalid")
+                                    }
+                                }
+                            } else {
+                                self.delegate?.recordFailed(error: "Photo library permission denied")
+                            }
+                        }
+                    } else {
+                        self.delegate?.recordFailed(error: "Temp file copy failed")
+                    }
+                } else {
+                    self.delegate?.recordFailed(error: "Invalid temp url or file url")
+                }
+            } else {
+                print(error as Any)
+                self.delegate?.recordFailed(error: "Merge Session failed")
+            }
+        }
     }
 }
-
 
 // MARK: - SCAssetExportSession delegate
 
